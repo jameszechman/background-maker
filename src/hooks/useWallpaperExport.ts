@@ -7,6 +7,40 @@ interface UseWallpaperExportReturn {
   isExporting: boolean;
 }
 
+async function saveWithTauri(dataUrl: string, filename: string): Promise<boolean> {
+  try {
+    const { save } = await import('@tauri-apps/plugin-dialog');
+    const { writeFile } = await import('@tauri-apps/plugin-fs');
+    
+    const filePath = await save({
+      defaultPath: filename,
+      filters: [
+        {
+          name: 'PNG Image',
+          extensions: ['png']
+        }
+      ]
+    });
+    
+    if (filePath) {
+      const base64Data = dataUrl.split(',')[1];
+      const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      await writeFile(filePath, binaryData);
+      return true;
+    }
+  } catch {
+    console.warn('Tauri save not available, using browser fallback');
+  }
+  return false;
+}
+
+function saveWithBrowser(dataUrl: string, filename: string): void {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = dataUrl;
+  link.click();
+}
+
 /**
  * Renders the wallpaper to a canvas and triggers a PNG download.
  * This avoids html-to-image entirely for reliability.
@@ -209,11 +243,12 @@ export function useWallpaperExport(
     setIsExporting(true);
     try {
       const dataUrl = await renderToCanvas(config, canvasRef.current);
+      const filename = `wallpaper-${screenSize.width}x${screenSize.height}.png`;
 
-      const link = document.createElement('a');
-      link.download = `wallpaper-${screenSize.width}x${screenSize.height}.png`;
-      link.href = dataUrl;
-      link.click();
+      const savedWithTauri = await saveWithTauri(dataUrl, filename);
+      if (!savedWithTauri) {
+        saveWithBrowser(dataUrl, filename);
+      }
     } catch (err) {
       console.error('Failed to export wallpaper:', err);
     } finally {

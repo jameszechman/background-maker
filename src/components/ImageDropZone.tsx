@@ -4,6 +4,46 @@ interface ImageDropZoneProps {
   onImageSelect: (src: string) => void;
 }
 
+async function openFileDialog(): Promise<string | null> {
+  let tauriAvailable = false;
+  try {
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    const { readFile } = await import('@tauri-apps/plugin-fs');
+    tauriAvailable = true;
+    
+    const selected = await open({
+      multiple: false,
+      directory: false,
+      filters: [
+        {
+          name: 'Images',
+          extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp']
+        }
+      ]
+    });
+    
+    if (selected && typeof selected === 'string') {
+      const contents = await readFile(selected);
+      const blob = new Blob([contents]);
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+    }
+    return null;
+  } catch {
+    console.warn('Tauri dialog not available, using browser fallback');
+    tauriAvailable = false;
+  }
+  
+  if (tauriAvailable) {
+    return null;
+  }
+  
+  return 'browser';
+}
+
 export function ImageDropZone({ onImageSelect }: ImageDropZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,9 +85,14 @@ export function ImageDropZone({ onImageSelect }: ImageDropZoneProps) {
     setIsDragOver(false);
   }, []);
 
-  const handleClick = useCallback(() => {
-    inputRef.current?.click();
-  }, []);
+  const handleClick = useCallback(async () => {
+    const result = await openFileDialog();
+    if (result === 'browser') {
+      inputRef.current?.click();
+    } else if (result) {
+      onImageSelect(result);
+    }
+  }, [onImageSelect]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
