@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# Wallpaper Maker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based tool for creating custom desktop wallpapers with beautiful backgrounds, images, borders, and text overlays.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Multiple Screen Sizes**: Presets for MacBook Pro, MacBook Air, 4K, 5K, UltraWide, and other popular resolutions
+- **Customizable Background**: Solid color or gradient backgrounds with adjustable colors and angles
+- **Image Upload**: Drag and drop or click to upload your own image
+- **Image Controls**: Scroll to zoom, drag to pan
+- **Border Styling**: Adjustable border radius and padding around your image
+- **Text Overlay**: Add custom text with customizable font, size, and color
+- **Export**: Download your wallpaper as a high-quality PNG
 
-## React Compiler
+## How to Use
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Add an Image**: Click the drop zone or drag and drop an image onto the canvas
+2. **Position Your Image**: Scroll to zoom in/out, click and drag to pan the image
+3. **Customize the Background**: Use the control panel to switch between solid color or gradient
+4. **Adjust the Border**: Set the border radius and padding to frame your image
+5. **Add Text** (optional): Enter custom text and adjust font, size, and color
+6. **Export**: Click "Export Wallpaper" to download your creation
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Start development server
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Build for production
+npm run build
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Preview production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- React 19
+- TypeScript
+- Vite
+- react-colorful (color picker)
