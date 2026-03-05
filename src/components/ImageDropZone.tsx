@@ -32,7 +32,7 @@ async function openFileDialog(): Promise<string | null> {
       });
     }
     return null;
-  } catch (e) {
+  } catch {
     console.warn('Tauri dialog not available, using browser fallback');
     tauriAvailable = false;
   }

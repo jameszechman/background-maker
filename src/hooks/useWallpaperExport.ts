@@ -28,7 +28,7 @@ async function saveWithTauri(dataUrl: string, filename: string): Promise<boolean
       await writeFile(filePath, binaryData);
       return true;
     }
-  } catch (e) {
+  } catch {
     console.warn('Tauri save not available, using browser fallback');
   }
   return false;
