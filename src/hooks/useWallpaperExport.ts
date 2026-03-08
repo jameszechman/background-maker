@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import type { ScreenSize, WallpaperConfig } from '../types';
+import type { ExportFormat, ScreenSize, WallpaperConfig } from '../types';
 
 interface UseWallpaperExportReturn {
   canvasRef: React.RefObject<HTMLDivElement | null>;
@@ -7,21 +7,26 @@ interface UseWallpaperExportReturn {
   isExporting: boolean;
 }
 
-async function saveWithTauri(dataUrl: string, filename: string): Promise<boolean> {
+const FORMAT_FILTER: Record<ExportFormat, { name: string; extensions: string[] }> = {
+  png: { name: 'PNG Image', extensions: ['png'] },
+  jpeg: { name: 'JPEG Image', extensions: ['jpg', 'jpeg'] },
+  webp: { name: 'WebP Image', extensions: ['webp'] },
+};
+
+async function saveWithTauri(
+  dataUrl: string,
+  filename: string,
+  format: ExportFormat
+): Promise<boolean> {
   try {
     const { save } = await import('@tauri-apps/plugin-dialog');
     const { writeFile } = await import('@tauri-apps/plugin-fs');
-    
+
     const filePath = await save({
       defaultPath: filename,
-      filters: [
-        {
-          name: 'PNG Image',
-          extensions: ['png']
-        }
-      ]
+      filters: [FORMAT_FILTER[format]],
     });
-    
+
     if (filePath) {
       const base64Data = dataUrl.split(',')[1];
       const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
@@ -41,10 +46,12 @@ function saveWithBrowser(dataUrl: string, filename: string): void {
   link.click();
 }
 
-/**
- * Renders the wallpaper to a canvas and triggers a PNG download.
- * This avoids html-to-image entirely for reliability.
- */
+const FORMAT_MIME: Record<ExportFormat, string> = {
+  png: 'image/png',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+};
+
 function renderToCanvas(
   config: WallpaperConfig,
   previewEl: HTMLDivElement
@@ -201,7 +208,9 @@ function renderToCanvas(
         }
       }
 
-      resolve(canvas.toDataURL('image/png'));
+      const mime = FORMAT_MIME[config.export.format];
+      const quality = config.export.format === 'png' ? undefined : config.export.quality;
+      resolve(canvas.toDataURL(mime, quality));
     };
 
     drawImage();
@@ -243,9 +252,11 @@ export function useWallpaperExport(
     setIsExporting(true);
     try {
       const dataUrl = await renderToCanvas(config, canvasRef.current);
-      const filename = `wallpaper-${screenSize.width}x${screenSize.height}.png`;
+      const shortId = config.id.split('-')[0];
+      const ext = config.export.format === 'jpeg' ? 'jpg' : config.export.format;
+      const filename = `wallpaper-${screenSize.width}x${screenSize.height}-${shortId}.${ext}`;
 
-      const savedWithTauri = await saveWithTauri(dataUrl, filename);
+      const savedWithTauri = await saveWithTauri(dataUrl, filename, config.export.format);
       if (!savedWithTauri) {
         saveWithBrowser(dataUrl, filename);
       }
