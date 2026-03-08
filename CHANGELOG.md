@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/jameszechman/background-maker/compare/v0.2.0...v0.3.0) (2026-03-08)
+
+
+### Features
+
+* **export:** add format selection and quality controls for wallpaper export ([23a79b1](https://github.com/jameszechman/background-maker/commit/23a79b1191143f136cb2fb70a7722da79c8a2dd4))
+
 ## [0.2.0](https://github.com/jameszechman/background-maker/compare/v0.1.0...v0.2.0) (2026-03-05)
 
 
