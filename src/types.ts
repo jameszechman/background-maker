@@ -55,7 +55,15 @@ export interface ImageTransform {
   scale: number;
 }
 
+export type ExportFormat = "png" | "jpeg" | "webp";
+
+export interface ExportConfig {
+  format: ExportFormat;
+  quality: number;
+}
+
 export interface WallpaperConfig {
+  id: string;
   screenSize: ScreenSize;
   background: BackgroundConfig;
   borderRadius: number;
@@ -63,9 +71,21 @@ export interface WallpaperConfig {
   imageTransform: ImageTransform;
   imageSrc: string | null;
   text: TextConfig;
+  export: ExportConfig;
 }
 
+export function generateId(): string {
+  return crypto.randomUUID();
+}
+
+export const EXPORT_FORMAT_LABELS: Record<ExportFormat, string> = {
+  png: "PNG (lossless)",
+  jpeg: "JPEG (smaller)",
+  webp: "WebP (smallest)",
+};
+
 export const DEFAULT_CONFIG: WallpaperConfig = {
+  id: generateId(),
   screenSize: SCREEN_SIZES[0],
   background: {
     mode: "solid",
@@ -88,5 +108,9 @@ export const DEFAULT_CONFIG: WallpaperConfig = {
     fontFamily:
       '"SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", "Courier New", monospace',
     showChevrons: true,
+  },
+  export: {
+    format: "webp",
+    quality: 0.85,
   },
 };

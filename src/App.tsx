@@ -3,7 +3,7 @@ import { WallpaperCanvas } from './components/WallpaperCanvas';
 import { ControlPanel } from './components/ControlPanel';
 import { useImageTransform } from './hooks/useImageTransform';
 import { useWallpaperExport } from './hooks/useWallpaperExport';
-import { DEFAULT_CONFIG } from './types';
+import { DEFAULT_CONFIG, generateId } from './types';
 import type { WallpaperConfig } from './types';
 import './App.css';
 
@@ -41,9 +41,7 @@ function App() {
 
   const handleImageSelect = useCallback(
     (src: string) => {
-      setConfig((prev) => ({ ...prev, imageSrc: src }));
-      // Set scale to 1 temporarily; the auto-fit callback will
-      // recalculate the correct scale once the image loads
+      setConfig((prev) => ({ ...prev, id: generateId(), imageSrc: src }));
       setScale(1);
       resetTransform();
     },
@@ -51,7 +49,7 @@ function App() {
   );
 
   const handleResetImage = useCallback(() => {
-    setConfig((prev) => ({ ...prev, imageSrc: null }));
+    setConfig((prev) => ({ ...prev, id: generateId(), imageSrc: null }));
     setScale(1);
     resetTransform();
   }, [resetTransform, setScale]);

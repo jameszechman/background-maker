@@ -1,7 +1,7 @@
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { ColorPicker } from './ColorPicker';
-import type { BackgroundConfig, TextConfig, WallpaperConfig } from '../types';
-import { SCREEN_SIZES } from '../types';
+import type { BackgroundConfig, ExportConfig, ExportFormat, TextConfig, WallpaperConfig } from '../types';
+import { EXPORT_FORMAT_LABELS, SCREEN_SIZES } from '../types';
 
 interface ControlPanelProps {
   config: WallpaperConfig;
@@ -37,6 +37,10 @@ export function ControlPanel({
 
   const handleTextChange = (updates: Partial<TextConfig>) => {
     onConfigChange({ text: { ...config.text, ...updates } });
+  };
+
+  const handleExportConfigChange = (updates: Partial<ExportConfig>) => {
+    onConfigChange({ export: { ...config.export, ...updates } });
   };
 
   return (
@@ -170,6 +174,38 @@ export function ControlPanel({
                 </div>
               </div>
             </>
+          )}
+        </div>
+
+        {/* Export Format */}
+        <div className="control-section">
+          <h3 className="control-section__title">Export Format</h3>
+          <div className="color-picker__mode-toggle">
+            {(Object.keys(EXPORT_FORMAT_LABELS) as ExportFormat[]).map((fmt) => (
+              <button
+                key={fmt}
+                className={`toggle-btn toggle-btn--small ${config.export.format === fmt ? 'toggle-btn--active' : ''}`}
+                onClick={() => handleExportConfigChange({ format: fmt })}
+              >
+                {fmt.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          {config.export.format !== 'png' && (
+            <div className="control-group">
+              <label className="control-label">
+                Quality: {Math.round(config.export.quality * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="1"
+                step="0.05"
+                value={config.export.quality}
+                onChange={(e) => handleExportConfigChange({ quality: Number(e.target.value) })}
+                className="slider"
+              />
+            </div>
           )}
         </div>
       </div>
